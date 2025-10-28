@@ -1,0 +1,100 @@
+*{
+    background-color: black;
+}
+.head2 {
+    margin-left: 5%;
+    margin-right: 5%;
+    display: flex;
+    align-items: center;
+    margin-top: 5%;
+    gap: 30%;
+}
+h3{
+    color: white;
+}
+button{
+    color: white;
+    font-size: 20px;
+}
+.login-page {
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-top: 10%;
+    margin-bottom: 20%;
+    background-color: black;
+}
+
+.login-page .error {
+    color: red;
+    font-size: 12px;
+    text-align: center;
+}
+
+.login-page input {
+    height: 40px;
+    width:90%;
+    border-radius: 20px;
+    border: none;
+    margin-bottom: 15px;
+    padding-left: 20px;
+
+    background-color: white;
+}
+
+.login-page input:active,
+.login-page input:focus {
+    outline: none;
+    border: none;
+}
+
+.login-page button {
+    height: 60px;
+    width: 100%;
+    border-radius: 10px;
+    border: none;
+    margin-bottom: 15px;
+    background-color: blue;
+    color: white;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.login-page p {
+    text-align: center;
+    color: white;
+}
+
+.toast {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    z-index: 1000;
+    color: white;
+}
+
+.toast.success { background-color: #28a745; }
+.toast.error { background-color: #dc3545; }
+
+@media (min-width: 768px) {
+    .logg {
+        background-color: #242424;
+        padding: 2.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        margin-top: 5%;
+        max-width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media (min-width: 1024px) {
+    .login-page input {
+        height: 60px;
+        font-size: 20px;
+    }
+}

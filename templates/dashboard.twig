@@ -1,0 +1,69 @@
+{% extends "base.twig" %}
+
+{% block styles %}
+<link rel="stylesheet" href="../public/Styles/Dashboard.css">
+{% endblock %}
+
+{% block content %}
+<header class="dashboard-header">
+  <h3 class="dashboard-title">TechWave</h3>
+  <button class="logout-btn" id="logout-btn">Logout</button>
+</header>
+<hr/>
+
+<section class="stats-container">
+  <div class="stats">
+    <div class="stat-card">
+      <h3 id="total-tickets">0</h3>
+      <p>Total Tickets</p>
+    </div>
+    <div class="stat-card">
+      <h3 id="open-tickets">0</h3>
+      <p>Open Tickets</p>
+    </div>
+    <div class="stat-card">
+      <h3 id="resolved-tickets">0</h3>
+      <p>Resolved Tickets</p>
+    </div>
+  </div>
+
+  <div class="manage-btn-wrap">
+    <button class="manage-btn" onclick="window.location.href='/tickets'">Manage Tickets</button>
+  </div>
+</section>
+
+<footer class="footer-nav">
+  <a href="/dashboard" class="nav-item">Home</a>
+  <a href="/tickets" class="nav-item">New Ticket</a>
+  <a href="/mine" class="nav-item">My Tickets</a>
+</footer>
+
+<script>
+const user = JSON.parse(localStorage.getItem('user'));
+if (!user) {
+  window.location.href = '/login';
+}
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  localStorage.removeItem('user');
+  window.location.href = '/login';
+});
+
+
+async function fetchStats() {
+  try {
+    const res = await fetch(`https://mockdata-93rw.onrender.com/users/${user.id}`);
+    const data = await res.json();
+    const tickets = data.tickets || [];
+
+    document.getElementById('total-tickets').textContent = tickets.length;
+    document.getElementById('open-tickets').textContent = tickets.filter(t => t.status === 'Open').length;
+    document.getElementById('resolved-tickets').textContent = tickets.filter(t => t.status === 'Resolved').length;
+  } catch (err) {
+    console.error('Error fetching tickets:', err);
+  }
+}
+
+fetchStats();
+</script>
+{% endblock %}

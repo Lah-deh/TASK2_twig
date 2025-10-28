@@ -1,0 +1,116 @@
+{% extends "base.twig" %}
+
+{% block styles %}
+<link rel="stylesheet" href="../public/Styles/Tickets.css">
+{% endblock %}
+
+{% block content %}
+<header class="dashboard-header">
+  <h3 class="dashboard-title">TechWave</h3>
+  <button class="logout-btn" id="logout">Logout</button>
+</header>
+<hr/>
+
+<section>
+  <h2>New Ticket</h2>
+  <div id="toast" class="toast"></div>
+
+  <form id="ticket-form">
+    <article>
+      <label for="title">Title</label>
+      <input type="text" id="title" name="title" required>
+    </article>
+
+    <article>
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="3" required></textarea>
+    </article>
+
+    <article>
+      <label for="priority">Priority</label>
+      <select id="priority" name="priority" required>
+        <option value="">Select</option>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+      </select>
+    </article>
+
+    <article>
+      <label for="status">Status</label>
+      <select id="status" name="status" required>
+        <option value="">Select</option>
+        <option value="Open">Open</option>
+        <option value="Resolved">Resolved</option>
+      </select>
+    </article>
+
+    <button type="submit">Create Ticket</button>
+  </form>
+</section>
+
+<footer class="footer-nav">
+  <a href="/dashboard" class="nav-item">Home</a>
+  <a href="/tickets" class="nav-item">New Ticket</a>
+  <a href="/mine" class="nav-item">My Tickets</a>
+</footer>
+
+<script>
+const user = JSON.parse(localStorage.getItem('user'));
+if (!user) window.location.href = '/login';
+
+document.getElementById('logout').addEventListener('click', () => {
+  localStorage.removeItem('user');
+  window.location.href = '/login';
+});
+
+const form = document.getElementById('ticket-form');
+const toast = document.getElementById('toast');
+
+function showToast(message, type='success') {
+  toast.textContent = message;
+  toast.className = 'toast ' + type;
+  toast.style.display = 'block';
+  setTimeout(() => { toast.style.display = 'none'; }, 3000);
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const newTicket = {
+    id: Math.random().toString(36).slice(2, 6),
+    title: form.title.value.trim(),
+    description: form.description.value.trim(),
+    priority: form.priority.value,
+    status: form.status.value,
+    createdAt: new Date().toISOString(),
+  };
+
+  try {
+    const res = await fetch(`https://mockdata-93rw.onrender.com/users/${user.id}`);
+    const data = await res.json();
+
+    const updatedUser = {
+      ...data,
+      tickets: [...(data.tickets || []), newTicket],
+    };
+
+    const update = await fetch(`https://mockdata-93rw.onrender.com/users/${user.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedUser),
+    });
+
+    if (update.ok) {
+      showToast('Ticket created successfully!', 'success');
+      form.reset();
+    } else {
+      showToast('Error saving ticket.', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Server error. Try again.', 'error');
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends "base.twig" %}
+
+{% block styles %}
+<link rel="stylesheet" href="../public/Styles/Mine.css">
+{% endblock %}
+
+{% block content %}
+<header class="dashboard-header">
+  <h3 class="dashboard-title">TechWave</h3>
+  <button class="logout-btn" id="logout">Logout</button>
+</header>
+<hr/>
+
+<section class="ticket-container">
+  <h2>My Tickets</h2>
+  <div id="toast" class="toast"></div>
+  <div id="ticket-grid" class="ticket-grid"></div>
+</section>
+
+<footer class="footer-nav">
+  <a href="/dashboard" class="nav-item">Home</a>
+  <a href="/tickets" class="nav-item">New Ticket</a>
+  <a href="/mine" class="nav-item">My Tickets</a>
+</footer>
+
+<script>
+const user = JSON.parse(localStorage.getItem('user'));
+if (!user) window.location.href = '/login';
+
+document.getElementById('logout').addEventListener('click', () => {
+  localStorage.removeItem('user');
+  window.location.href = '/login';
+});
+
+const grid = document.getElementById('ticket-grid');
+const toast = document.getElementById('toast');
+const API = "https://mockdata-93rw.onrender.com";
+
+function showToast(message, type='success') {
+  toast.textContent = message;
+  toast.className = 'toast ' + type;
+  toast.style.display = 'block';
+  setTimeout(() => { toast.style.display = 'none'; }, 3000);
+}
+
+async function loadTickets() {
+  try {
+    const res = await fetch(`${API}/users/${user.id}`);
+    const data = await res.json();
+    const tickets = data.tickets || [];
+
+    if (tickets.length === 0) {
+      grid.innerHTML = "<p>No tickets found.</p>";
+      return;
+    }
+
+    grid.innerHTML = tickets.map(ticket => `
+      <div class="ticket-card" data-id="${ticket.id}">
+        <div class="view-mode">
+          <h3>${ticket.title}</h3>
+          <p>${ticket.description}</p>
+          <p><strong>Priority:</strong> ${ticket.priority}</p>
+          <p><strong>Status:</strong> ${ticket.status}</p>
+          <p class="timestamp">${new Date(ticket.createdAt).toLocaleString()}</p>
+          <div class="card-actions">
+            <button class="edit-btn">Edit</button>
+            <button class="delete-btn">Delete</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load tickets.', 'error');
+  }
+}
+
+grid.addEventListener('click', async (e) => {
+  const card = e.target.closest('.ticket-card');
+  if (!card) return;
+  const id = card.dataset.id;
+
+  if (e.target.classList.contains('delete-btn')) {
+    if (!confirm('Are you sure you want to delete this ticket?')) return;
+    try {
+      const res = await fetch(`${API}/users/${user.id}`);
+      const data = await res.json();
+      const updated = data.tickets.filter(t => t.id !== id);
+
+      await fetch(`${API}/users/${user.id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({...data, tickets: updated})
+      });
+
+      showToast('Ticket deleted successfully!', 'success');
+      loadTickets();
+    } catch (err) {
+      console.error(err);
+      showToast('Error deleting ticket.', 'error');
+    }
+  }
+
+  if (e.target.classList.contains('edit-btn')) {
+    const title = card.querySelector('h3').textContent;
+    const desc = card.querySelector('p').textContent;
+    const priority = card.querySelectorAll('p strong')[0].nextSibling.textContent.trim();
+    const status = card.querySelectorAll('p strong')[1].nextSibling.textContent.trim();
+
+    card.innerHTML = `
+      <input type="text" id="edit-title" value="${title}">
+      <textarea id="edit-desc">${desc}</textarea>
+      <select id="edit-priority">
+        <option ${priority === 'Low' ? 'selected' : ''}>Low</option>
+        <option ${priority === 'Medium' ? 'selected' : ''}>Medium</option>
+        <option ${priority === 'High' ? 'selected' : ''}>High</option>
+      </select>
+      <select id="edit-status">
+        <option ${status === 'Open' ? 'selected' : ''}>Open</option>
+        <option ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+        <option ${status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+      </select>
+      <div class="card-actions">
+        <button class="save-btn">Save</button>
+        <button class="cancel-btn">Cancel</button>
+      </div>
+    `;
+
+    card.querySelector('.cancel-btn').addEventListener('click', loadTickets);
+
+    card.querySelector('.save-btn').addEventListener('click', async () => {
+      const updatedTicket = {
+        id,
+        title: card.querySelector('#edit-title').value.trim(),
+        description: card.querySelector('#edit-desc').value.trim(),
+        priority: card.querySelector('#edit-priority').value,
+        status: card.querySelector('#edit-status').value,
+        createdAt: new Date().toISOString(),
+      };
+
+      try {
+        const res = await fetch(`${API}/users/${user.id}`);
+        const data = await res.json();
+        const updated = data.tickets.map(t => t.id === id ? updatedTicket : t);
+
+        await fetch(`${API}/users/${user.id}`, {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({...data, tickets: updated})
+        });
+
+        showToast('Ticket updated successfully!', 'success');
+        loadTickets();
+      } catch (err) {
+        console.error(err);
+        showToast('Error saving ticket.', 'error');
+      }
+    });
+  }
+});
+
+loadTickets();
+</script>
+{% endblock %}

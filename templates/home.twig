@@ -1,0 +1,65 @@
+{% extends "base.twig" %}
+
+{% block styles %}
+<link rel="stylesheet" href="../public/Styles/Home.css">
+{% endblock %}
+
+{% block content %}
+<header class="header">
+  <h2>TechWave</h2>
+  <i class="fa-solid fa-bars burger"></i>
+</header>
+
+<section class="hero">
+  <h2>Welcome to TechWave - Where Innovation Meets Experience.</h2>
+  <p>Join us for an immersive tech event with workshops, talks, and hands-on sessions. Connect, explore trends, and grow your skills.</p>
+  <button>
+    <a href="/register" class="li">Get Started</a>
+  </button>
+</section>
+
+<section class="features" id="fee">
+  <h2 class="heading">Key Features</h2>
+  <div class="grid">
+    <div class="feature-card">
+      <i class="fa-solid fa-laptop-code icon"></i>
+      <h3>Hands-On Learning</h3>
+      <p>Participate in workshops led by industry experts and gain practical experience with the latest tech tools.</p>
+    </div>
+    <div class="feature-card">
+      <i class="fa-solid fa-lightbulb icon"></i>
+      <h3>Expert Insights</h3>
+      <p>Hear from top innovators and thought leaders about emerging trends and real-world applications.</p>
+    </div>
+    <div class="feature-card">
+      <i class="fa-solid fa-people-arrows icon"></i>
+      <h3>Connect & Collaborate</h3>
+      <p>Meet like-minded peers, share ideas, and expand your professional network.</p>
+    </div>
+    <div class="feature-card">
+      <i class="fa-solid fa-microchip icon"></i>
+      <h3>Discover Innovations</h3>
+      <p>Explore cutting-edge projects and tech demonstrations shaping the future.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-logo">
+      <h2>TechWave</h2>
+    </div>
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="/register">Register</a>
+      <a href="/login">Login</a>
+    </div>
+    <div class="footer-socials">
+      <a href="https://twitter.com" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+      <a href="https://linkedin.com" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
+      <a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+    </div>
+  </div>
+  <p class="footer-copy">© 2025 TechWave. All rights reserved.</p>
+</footer>
+{% endblock %}
